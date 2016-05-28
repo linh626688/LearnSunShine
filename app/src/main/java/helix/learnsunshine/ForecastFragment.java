@@ -1,9 +1,13 @@
 package helix.learnsunshine;
 
 import android.app.Fragment;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.text.format.Time;
 import android.util.Log;
@@ -13,8 +17,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ForecastFragment extends Fragment {
+    public static final String KEY_INTENT = "KEY INTENT";
     private ArrayAdapter<String> mForecastAdapter;
     private ListView listView;
 
@@ -52,51 +59,57 @@ public class ForecastFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            FitchWeatherTask weatherTask = new FitchWeatherTask();
-            weatherTask.execute("94043");
+            updateWeather();
             return true;
+        }
+        if (id == R.id.action_settings) {
+            Intent intent = new Intent(getActivity(), SettingsActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    public void updateWeather() {
+        FitchWeatherTask weatherTask = new FitchWeatherTask();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = preferences.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+        weatherTask.execute(location);
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//            super.onCreateView(inflater, container, savedInstanceState);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-        List<String> weekForeCast = new ArrayList<String>() {
-        };
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
-        weekForeCast.add("Today-Sunny-88/63");
 
 
         mForecastAdapter = new ArrayAdapter<String>(
                 getActivity(),
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview,
-                weekForeCast);
+                new ArrayList<String>());
 
         listView = (ListView) rootView.findViewById(R.id.listview_forecast);
 
         listView.setAdapter(mForecastAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Toast.makeText(getActivity(), mForecastAdapter.getItem(position), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(KEY_INTENT, mForecastAdapter.getItem(position));
+                startActivity(intent);
+            }
+        });
         return rootView;
     }
 
@@ -237,7 +250,7 @@ public class ForecastFragment extends Fragment {
                         .appendQueryParameter(APPID_PARAM, KeyAPI)
                         .build();
                 URL url = new URL(builtUri.toString());
-                Log.i("test tag", url.toString());
+//                Log.i("test tag", url.toString());
 //                Toast.makeText(getActivity(), url.toString(), Toast.LENGTH_SHORT).show();
 
 //                Log.i(LOG_TAG, "Built URI " + builtUri.toString());
@@ -269,7 +282,7 @@ public class ForecastFragment extends Fragment {
                 }
                 forecastJsonStr = buffer.toString();
 
-                Log.i(LOG_TAG, "Forecast Json String " + forecastJsonStr);
+//                Log.i(LOG_TAG, "Forecast Json String " + forecastJsonStr);
 
 
             } catch (IOException e) {

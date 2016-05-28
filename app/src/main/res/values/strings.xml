@@ -2,4 +2,15 @@
     <string name="app_name">LearnSunShine</string>
     <string name="refresh">refresh</string>
     <string name="help">help</string>
+    <string name="action_settings">setings</string>
+    <string name="title_activity_detail">title activity detail</string>
+    <string name="title_activity_settings">title activity setting</string>
+    <!-- Label for the location preference [CHAR LIMIT=30] -->
+    <string name="pref_location_label">Location</string>
+
+    <!-- Key name for storing location in SharedPreferences [CHAR LIMIT=NONE] -->
+    <string name="pref_location_key" translatable="false">location</string>
+
+    <!-- Default postal code for location preference [CHAR LIMIT=NONE] -->
+    <string name="pref_location_default" translatable="false">94043</string>
 </resources>

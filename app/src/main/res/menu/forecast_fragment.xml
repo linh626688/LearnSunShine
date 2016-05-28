@@ -4,6 +4,9 @@
         android:id="@+id/action_refresh"
         android:title="@string/refresh" />
     <item
+        android:id="@+id/action_settings"
+        android:title="setting" />
+    <item
         android:id="@+id/help"
         android:title="@string/help" />
 </menu>
